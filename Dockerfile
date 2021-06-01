@@ -19,11 +19,12 @@ yum -y install perl-PathTools perl-Scalar-List-Utils perl-Storable
 
 RUN echo "Install Starman and Dependancies from OpenFusion RPM repo";\
 yum -y install http://repo.openfusion.net/centos7-x86_64/openfusion-release-0.8-1.of.el7.noarch.rpm;\
-yum -y install perl-Starman
+yum -y install perl-Starman --enablerepo=of
 
 RUN echo "Install PSGI Application Dependancies";\
-yum -y install perl-DateTime;\
-yum -y install http://linux.davisnetworks.com/el7/updates/perl-Plack-Middleware-Expires-0.06-1.el7.mrdvt92.noarch.rpm http://linux.davisnetworks.com/el7/updates/perl-Cookie-Baker-0.11-1.el7.mrdvt92.noarch.rpm http://linux.davisnetworks.com/el7/updates/perl-Plack-Middleware-Session-0.33-1.el7.mrdvt92.noarch.rpm
+yum -y install perl-DateTime --disablerepo=of;\
+yum -y install http://linux.davisnetworks.com/el7/updates/mrdvt92-release-8-2.el7.mrdvt92.noarch.rpm;\
+yum -y install 'perl(Plack::Middleware::Expires)' 'perl(Plack::Middleware::Session::Cookie)' --enablerepo=mrdvt92-updates
 
 #Install PSGI Application into /app/ folder
 COPY ./app.psgi /app/
