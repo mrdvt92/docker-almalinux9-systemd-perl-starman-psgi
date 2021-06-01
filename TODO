@@ -1,0 +1,2 @@
+TODO
+  - It would be best to build as RPM package with app.psgi, starman.service, and the dependancies in Dockerfile to sparate application from Docker build

@@ -16,31 +16,39 @@ The docker image uses the Systemd configuration from https://hub.docker.com/_/ce
 
 # Systemd Unit File
 
-The Starman Systemd Unit File is installed by the Dockerfile as /usr/lib/systemd/system/starman.service and then enabled with systemctl.  Starman is configured to run 3 workers and to listen on port 80.
+The Starman Systemd Unit File is installed by the Dockerfile as ```/usr/lib/systemd/system/starman.service``` and then enabled with ```systemctl```.  Starman is configured to run 3 workers and to listen on port 80 (this port must match the Dockerfile exposed port).
 
 # PSGI App
 
-The PSGI App ```app.psgi```  is saved in the image as ```/app/app.psgi```.
+The PSGI App ```app.psgi```  is saved inside the Docker image as ```/app/app.psgi```. This path is hard coded in the service file.
 
 # PSGI App Dependencies
 
-Dependencies to run the PSGI app inside the container must be install in the Dockerfile.  We install four dependencies for our example PSGI program one from CentOS 7 base repository and two from [DavisNetworks.com](http://linux.davisnetworks.com/el7/updates/) repository.
+Dependencies to run the PSGI app inside the container must be installed in the Dockerfile.  We install three dependencies for our example PSGI program one from the CentOS 7 base repository and two from the [DavisNetworks.com](http://linux.davisnetworks.com/el7/updates/) repository.
 
-1. [DateTime](https://metacpan.org/release/DateTime)
-2. [Plack::Middleware::Expires](https://metacpan.org/release/Plack-Middleware-Expires)
-3. [Plack::Middleware::Session::Cookie](https://metacpan.org/release/Plack-Middleware-Session)
+* [DateTime](https://metacpan.org/release/DateTime)
+* [Plack::Middleware::Expires](https://metacpan.org/release/Plack-Middleware-Expires)
+* [Plack::Middleware::Session::Cookie](https://metacpan.org/release/Plack-Middleware-Session)
 
 # Docker Build Command
 
-  $ sudo docker build --rm --tag=local/centos7-systemd-perl-starman-psgi .
+```
+$ sudo docker build --rm --tag=local/centos7-systemd-perl-starman-psgi .
+```
 
 * --rm - Remove intermediate containers after a successful build.
 
 # Docker Run Command
 
-  $ sudo docker run --detach --name starman --tmpfs /run -v /sys/fs/cgroup:/sys/fs/cgroup:ro --publish 5000:80 local/centos7-systemd-perl-starman-psgi
+```
+$ sudo docker run --detach --name starman --tmpfs /run --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --publish 5000:80 local/centos7-systemd-perl-starman-psgi
+```
 
 * --detach - Detached mode: run the container in the background and print the new container ID. (run as -ti to see more information for debugging)
 * --tmpfs - required setting for CentOS 7 with Systemd
-* -v - required volumn setting for CentOS 7 with Systemd
+* --volume - required volume setting for CentOS 7 with Systemd
 * --publish - Publish a container's port, or range of ports, to the host - [host]:[container]
+
+# See Also
+
+* [CentOS7-Systemd-Mojolicious](https://github.com/bislink/CentOS7-Systemd-Mojolicious)
