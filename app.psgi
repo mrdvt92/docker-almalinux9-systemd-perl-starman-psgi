@@ -8,9 +8,12 @@ use MIME::Base64 qw{};
 use Plack::Middleware::Expires qw{};
 use Plack::Middleware::Session::Cookie qw{};
 
+my $GLOBAL = 0;
+
 my $app = sub {
     my $env     = shift;
     my $session = $env->{'psgix.session'};
+    $GLOBAL++;
     $session->{'counter'}++;
     $session->{'init'} ||= DateTime->now->datetime;
 
@@ -18,7 +21,7 @@ my $app = sub {
         200,
         [ 'Content-Type' => 'text/plain' ],
         [
-          sprintf("Counter: %s\nProcess: %s\n\n", $session->{'counter'}, $$),
+          sprintf("Cookie Session Counter: %s\nProcess ID: %s\nGlobal Counter: %s\n\n", $session->{'counter'}, $$, $GLOBAL),
           Dumper($env),
         ],
     ];
