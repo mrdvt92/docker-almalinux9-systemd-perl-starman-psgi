@@ -1,26 +1,20 @@
+CONTAINER_NAME=starman
+IMAGE_NAME=local/starman
+
 all:
-	@echo "Syntax:"
-	@echo "  make build   # builds the docker image from the Dockerfile as local/centos7-systemd-perl-starman-psgi"
-	@echo "  make run     # runs the docker image local/centos7-systemd-perl-starman-psgi as starman on http://127.0.0.1:5000/"
-	@echo "  make rm      # stops and removes the image starman"
-	@echo "  make shell   # executes a bash shell on the running starman container"
-	@echo "  make journal # executes journalctl inside the starman container"
 
 build:	Dockerfile app.psgi starman.service
-	docker build --rm --tag=local/centos7-systemd-perl-starman-psgi .
+	docker build --rm --tag=$(IMAGE_NAME) .
 
 run:
-	docker run --detach --name starman --tmpfs /run --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro --publish 5000:80 local/centos7-systemd-perl-starman-psgi
+	docker run -ti --privileged --name $(CONTAINER_NAME) --cap-add SYS_ADMIN --security-opt seccomp=unconfined --cgroup-parent=docker.slice --cgroupns=private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock --publish 5000:80 $(IMAGE_NAME)
 
 bash:
-	docker exec -it starman /bin/bash
+	docker exec -it $(CONTAINER_NAME) /bin/bash
 
 rm:	
-	docker stop starman
-	docker rm starman
-
-shell:
-	docker exec -it starman /bin/bash
+	docker stop $(CONTAINER_NAME)
+	docker rm $(CONTAINER_NAME)
 
 journal:
-	docker exec -it starman journalctl -f -u starman.service
+	docker exec -it $(CONTAINER_NAME) journalctl -f -u starman.service
